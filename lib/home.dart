@@ -53,6 +53,11 @@ class _HomeState extends State<Home> {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text('Chargement terminé.')));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text(
+                                          'Veuillez saisir une valeur valide.')));
                             }
 
                             setState(() {
