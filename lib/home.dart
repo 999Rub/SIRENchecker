@@ -10,9 +10,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String? siren;
+  String? sirensiret = '';
   final _formkey = GlobalKey<FormState>();
   Siren? sirencheck;
+  Siret? siretcheck;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +25,7 @@ class _HomeState extends State<Home> {
               margin: EdgeInsets.only(
                   top: MediaQuery.of(context).size.height * 0.1),
               child: Text(
-                'SIREN Checker',
+                'SIREN/SIRET Checker',
                 style: TextStyle(
                     fontSize: MediaQuery.of(context).size.height * 0.075),
               ),
@@ -36,32 +37,38 @@ class _HomeState extends State<Home> {
                   child: Column(
                     children: [
                       TextFormField(
+                        decoration:
+                            InputDecoration(hintText: 'SIRET / SIRET checker'),
                         onChanged: (value) {
                           setState(() {
-                            siren = value;
-                            print(siren);
+                            sirensiret = value;
+                            print(sirensiret);
                           });
                         },
                       ),
                       CupertinoButton(
                           child: Text('Vérifier'),
                           onPressed: () async {
-                            if (siren != null &&
-                                _formkey.currentState!.validate()) {
-                              sirencheck =
-                                  await ApiService().checkIfSirenExist(siren!);
+                            if (_formkey.currentState!.validate() &&
+                                sirensiret!.isNotEmpty) {
+                              sirensiret!.length > 9
+                                  ? siretcheck =
+                                      await ApiService(sirensiret: sirensiret!)
+                                          .checkIfSirenExist()
+                                  : sirencheck =
+                                      await ApiService(sirensiret: sirensiret!)
+                                          .checkIfSirenExist();
                               ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text('Chargement terminé.')));
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text(
-                                          'Veuillez saisir une valeur valide.')));
                             }
 
                             setState(() {
-                              sirencheck = sirencheck;
+                              if (sirensiret!.length > 9) {
+                                siretcheck = siretcheck;
+                              } else {
+                                sirencheck = sirencheck;
+                              }
                             });
                           }),
                     ],
@@ -70,10 +77,14 @@ class _HomeState extends State<Home> {
             sirencheck?.name != 'Inconnue' && sirencheck?.name != null
                 ? Container(
                     child: Text(
-                        "Le SIREN existe et correspond à : ${sirencheck?.name}"),
+                        "Le SIREN existe et correspond à ${sirencheck?.categorie} : ${sirencheck?.name} qui a été créée le ${sirencheck?.creation}"),
                   )
+                : Text("Aucune entreprise n'existe pour ce SIREN."),
+            siretcheck?.name != 'Inconnue' && siretcheck?.name != null
+                ? Text(
+                    "Le SIRET existe et correspond à ${siretcheck?.categorie} : ${siretcheck?.name} qui a été créée le ${siretcheck?.creation}  à ${siretcheck?.ville} - ${siretcheck?.codepostal}")
                 : Container(
-                    child: Text("Aucune entreprise n'existe pour ce SIREN."),
+                    child: Text("Aucune entreprise n'existe pour ce SIRET."),
                   )
           ],
         ),
