@@ -38,7 +38,7 @@ class _HomeState extends State<Home> {
                     children: [
                       TextFormField(
                         decoration:
-                            InputDecoration(hintText: 'SIRET / SIRET checker'),
+                            InputDecoration(hintText: 'SIREN / SIRET checker'),
                         onChanged: (value) {
                           setState(() {
                             sirensiret = value;
